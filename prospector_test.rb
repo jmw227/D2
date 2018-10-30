@@ -11,6 +11,40 @@ class ProspectorTest < Minitest::Test
 	refute_nil pros
   end
   
+  #UNIT TEST FOR METHOD sg?
+  # gold != 1 -> 's'
+  #gold == 1 -> ''
+  
+    #test if gold != 1, sg is set to 's'
+  def test_sg_not_one
+
+    p = Prospector.new(0, 0, 0)
+    assert p.sg?(4), 's'
+  end
+  #test if gold == 1, sg is set to ''
+    def test_sg_one
+    p = Prospector.new(0, 0, 0)
+    assert p.sg?(1), ''
+  end
+  
+  #UNIT TEST FOR METHOD s?
+  #silver != 1 -> 's'
+  #silver == 1 -> 's'
+  
+  #test if silver != 1, s is set to 's'
+  def test_s_not_one
+    p = Prospector.new(0, 0, 0)
+    assert p.s?(4), 's'
+  end
+  
+  
+  #test if silver == 1, s is set to ''
+  def test_s_one
+    p = Prospector.new(0, 0, 0)
+    assert p.s?(1), ''
+  end
+  
+  
   #UNIT TESTS FOR METHOD get_gold(rng)
   #Equivalence classes:
   #max_gold = 0 -> returns 0
@@ -27,7 +61,6 @@ class ProspectorTest < Minitest::Test
 	assert_equal p.get_gold(mock_rng), 1
   end
   
-  
   #test if max gold is 0 we will always get 0
   #EDGE CASE
   def test_get_gold_zero_max
@@ -41,7 +74,7 @@ class ProspectorTest < Minitest::Test
   
   #UNIT TESTS FOR METHOD get_silver(rng)
   #Equivalence classes:
-  # max_silver = 0 -> returns 0
+  # max_silver = 0 -> returns 0, @s set to 's'
   #max_silver > 0 -> returns value from Random Number Generator
   
   #test if max silver is greater than 0 we get a value from the 
@@ -53,6 +86,16 @@ class ProspectorTest < Minitest::Test
 	mock_rng = Minitest::Mock.new("mock_rng")
 	def mock_rng.rand(a);1;end
 	assert_equal p.get_silver(mock_rng), 1
+  end
+  
+  def test_get_silver_set_s
+    mock_loc = Minitest::Mock.new("mock_loc")
+	def mock_loc.max_silver;2;end
+    p = Prospector.new(0, mock_loc, 0)
+	mock_rng = Minitest::Mock.new("mock_rng")
+	def mock_rng.rand(a);2;end
+	p.get_silver(mock_rng)
+	assert 's', p.s
   end
   
   
@@ -71,11 +114,17 @@ class ProspectorTest < Minitest::Test
   #Equivalence classes:
   #gold_found = 0 and silver_found = 0 -> 
   #"No precious metals found" string
-  #gold_found = 0 and silver_found > 0 -> 
-  #"{silver_found} ounce(s) of silver found" string
-  #gold_found > 0 and silver_found = 0 -> 
-  #"{gold_found} ounce(s) of gold found)" string
-  #gold_found > 0 and silver_found > 0 -> 
+  #gold_found = 0 and silver_found = 1 ->
+  #"1 ounce of silver found" string
+  #gold_found = 0 and silver_found > 1 -> 
+  #"{silver_found} ounces of silver found" string
+  #gold_found = 1 and silver_found = 0 ->
+  #"1 ounce of gold found" string
+  #gold_found > 1 and silver_found = 0 -> 
+  #"{gold_found} ounces of gold found" string
+  #gold_found = 1 and silver_found = 1 ->
+  #"1 ounce of gold and 1 ounce of silver found" string
+  #gold_found > 1 and silver_found > 1 -> 
   #"{gold_found} ounces of gold and {silver_found} ounces of silver found" string
 
   #test if gold_found and silver_found are both 0
@@ -96,32 +145,55 @@ class ProspectorTest < Minitest::Test
     p = Prospector.new(0, mock_loc, 0)
 	p.silver_found = 3
 	p.gold_found = 3
-	assert_equal 'Found 3 ounce(s) of gold and 3 ounce(s) of silver in Sutter Creek', p.string_findings
+	p.s = 's'
+	p.sg = 's'
+	assert_equal 'Found 3 ounces of gold and 3 ounces of silver in Sutter Creek', p.string_findings
   end
   
   #test if gold_found is not zero but silver_found is zero
-  #EDGE CASE
   def test_string_results_silver_zero
     mock_loc = Minitest::Mock.new("mock_loc")
 	def mock_loc.name;'Sutter Creek';end
     p = Prospector.new(0, mock_loc, 0)
 	p.silver_found = 0
 	p.gold_found = 3
-	assert_equal 'Found 3 ounce(s) of gold in Sutter Creek', p.string_findings
+	p.sg = 's'
+	assert_equal 'Found 3 ounces of gold in Sutter Creek', p.string_findings
   end
   
   #test if gold_found is zero but silver_found is not zero
-  #that the correct message string is generated
-  #EDGE CASE
   def test_string_results_gold_zero
     mock_loc = Minitest::Mock.new("mock_loc")
 	def mock_loc.name;"Sutter Creek";end
     p = Prospector.new(0, mock_loc, 0)
 	p.silver_found = 3
 	p.gold_found = 0
-	assert_equal '3 ounce(s) of silver found in Sutter Creek', p.string_findings
+	p.s = 's'
+	assert_equal 'Found 3 ounces of silver in Sutter Creek', p.string_findings
   end
   
+  #test if gold_found is zero but silver_found is 1
+  def test_string_results_gold_zero_silver_one
+    mock_loc = Minitest::Mock.new("mock_loc")
+	def mock_loc.name;"Sutter Creek";end
+    p = Prospector.new(0, mock_loc, 0)
+	p.silver_found = 1
+	p.gold_found = 0
+	p.s = ''
+	assert_equal 'Found 1 ounce of silver in Sutter Creek', p.string_findings
+  end
+  
+  #test if gold_found = 1 but silver_found is 0
+   def test_string_results_gold_one_silver_zero
+    mock_loc = Minitest::Mock.new("mock_loc")
+	def mock_loc.name;"Sutter Creek";end
+    p = Prospector.new(0, mock_loc, 0)
+	p.silver_found = 0
+	p.gold_found = 1
+	p.sg = ''
+	p.s = ''
+	assert_equal 'Found 1 ounce of gold in Sutter Creek', p.string_findings
+  end
   #UNIT TESTS FOR METHOD change_locations
   #SUCCESS CASES: The next location chosen is a neighbor of the current location
   #FAILURE CASES: The next location chosen is not a neighbor of the current location
@@ -137,9 +209,29 @@ class ProspectorTest < Minitest::Test
 	dummy_rng = Minitest::Mock.new("dummy_rng")
 	def mock_loc.choose_neighbor(a);1;end
     p = Prospector.new(0, mock_loc, 0)
-	assert_equal mock_loc2, p.move(dummy_rng, map)
+	p.move(dummy_rng, map)
+	assert_equal mock_loc2, p.current_loc
 	assert_equal 1, p.current_loc_id
   end
+  
+  #test to ensure string output for move is correct
+  def test_move_str
+      mock_loc = Minitest::Mock.new "mock_loc"
+	def mock_loc.name;"previous location";end
+	mock_loc2 = Minitest::Mock.new "mock_loc2"
+	def mock_loc2.name;"next location";end
+	map = Map.new
+	map.nodes = [mock_loc, mock_loc2]
+	dummy_rng = Minitest::Mock.new("dummy_rng")
+	def mock_loc.choose_neighbor(a);1;end
+    p = Prospector.new(0, mock_loc, 0)
+	p.total_gold = 1
+	p.total_silver = 1
+	assert p.move(dummy_rng, map), "Heading from previous location to next location "\
+    "holding 1 ounce of gold and "\
+	"#1 ounce of silver"
+  end
+  
   
   
   #UNIT TEST FOR METHOD reset

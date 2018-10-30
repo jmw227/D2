@@ -10,6 +10,8 @@ class Prospector
   attr_accessor :gold_found
   attr_accessor :silver_found
   attr_accessor :moving
+  attr_accessor :sg
+  attr_accessor :s
   def initialize(id, loc, loc_id)
     @id = id
     @current_loc = loc
@@ -17,10 +19,25 @@ class Prospector
     @total_gold = @total_silver = 0
     @num_loc_visited = 1
     @num_days = 0
-    @current_loc = loc
-    @gold_found = 0
-    @silver_found = 0
+    @gold_found = @silver_found = 0
     @moving = false
+    @s = @sg = ''
+  end
+
+  def sg?(gold)
+    @sg = if gold == 1
+            ''
+          else
+            's'
+          end
+  end
+
+  def s?(silver)
+    @s = if silver == 1
+           ''
+         else
+           's'
+         end
   end
 
   def prospect(rng)
@@ -34,6 +51,7 @@ class Prospector
 
     @gold_found = rng.rand(current_loc.max_gold + 1)
     @total_gold += @gold_found
+    sg?(@gold_found)
     @gold_found
   end
 
@@ -42,6 +60,7 @@ class Prospector
 
     @silver_found = rng.rand(current_loc.max_silver + 1)
     @total_silver += @silver_found
+    s?(@silver_found)
     @silver_found
   end
 
@@ -54,24 +73,25 @@ class Prospector
     if @gold_found.zero? && @silver_found.zero?
       "Found no precious metals in #{@current_loc.name}"
     elsif @gold_found.zero?
-      "#{@silver_found} ounce(s) of silver found in #{@current_loc.name}"
+      "Found #{@silver_found} ounce" + @s + " of silver in #{@current_loc.name}"
     elsif @silver_found.zero?
-      "Found #{@gold_found} ounce(s) of gold in #{@current_loc.name}"
+      "Found #{@gold_found} ounce" + @sg + " of gold in #{@current_loc.name}"
     else
-      "Found #{@gold_found} ounce(s) of gold and "\
-      "#{@silver_found} ounce(s) of silver in #{@current_loc.name}"
+      "Found #{@gold_found} ounce" + @sg + ' of gold and '\
+      "#{@silver_found} ounce" + @s + " of silver in #{@current_loc.name}"
     end
   end
 
   def move(rng, map)
     new_loc_id = @current_loc.choose_neighbor(rng)
     new_loc = map.nodes[new_loc_id]
-    puts "Heading from #{@current_loc.name} to #{new_loc.name}, "\
-    "holding #{@total_gold} ounce(s) of gold and #{@total_silver} ounce(s)"\
-    'of silver'
+    str = "Heading from #{@current_loc.name} to #{new_loc.name}, "\
+    "holding #{@total_gold} ounce" + sg?(@total_gold) + ' of gold and '\
+	"#{@total_silver} ounce" + s?(@total_silver) + ' of silver'
     @num_loc_visited += 1
     @current_loc_id = new_loc_id
     @current_loc = new_loc
+    str
   end
 
   def leaving?

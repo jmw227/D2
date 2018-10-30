@@ -27,7 +27,8 @@ rng = Random.new seed
     p.prospect(rng)
     puts("\t" + p.string_findings)
     if p.leaving? && p.num_loc_visited < 5
-      p.move(rng, map)
+      puts(p.move(rng, map))
+	  
     elsif p.leaving? && p.num_loc_visited == 5
       done = false
     end
@@ -35,7 +36,7 @@ rng = Random.new seed
   cash = p.cash_out
   puts("After #{p.num_days} days, Prospector ##{p.id} "\
   "returned to San Francisco with:\n\t"\
-  "#{p.total_gold} ounces of gold\n\t"\
-  "#{p.total_silver} ounces of silver")
+  "#{p.total_gold} ounce" + p.sg?(p.total_gold) + " of gold\n\t"\
+  "#{p.total_silver} ounce" + p.s?(p.total_silver) + ' of silver')
   puts("\tReturning home with " + cash)
 end
