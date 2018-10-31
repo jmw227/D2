@@ -173,6 +173,7 @@ class ProspectorTest < Minitest::Test
   end
   
   #test if gold_found is zero but silver_found is 1
+  #EDGE CASE
   def test_string_results_gold_zero_silver_one
     mock_loc = Minitest::Mock.new("mock_loc")
 	def mock_loc.name;"Sutter Creek";end
@@ -184,6 +185,7 @@ class ProspectorTest < Minitest::Test
   end
   
   #test if gold_found = 1 but silver_found is 0
+  #EDGE CASE
    def test_string_results_gold_one_silver_zero
     mock_loc = Minitest::Mock.new("mock_loc")
 	def mock_loc.name;"Sutter Creek";end
