@@ -15,7 +15,7 @@ class ProspectorTest < Minitest::Test
   # gold != 1 -> 's'
   #gold == 1 -> ''
   
-    #test if gold != 1, sg is set to 's'
+  #test if gold != 1, sg is set to 's'
   def test_sg_not_one
 
     p = Prospector.new(0, 0, 0)
@@ -37,13 +37,11 @@ class ProspectorTest < Minitest::Test
     assert p.s?(4), 's'
   end
   
-  
   #test if silver == 1, s is set to ''
   def test_s_one
     p = Prospector.new(0, 0, 0)
     assert p.s?(1), ''
   end
-  
   
   #UNIT TESTS FOR METHOD get_gold(rng)
   #Equivalence classes:
@@ -97,7 +95,6 @@ class ProspectorTest < Minitest::Test
 	p.get_silver(mock_rng)
 	assert 's', p.s
   end
-  
   
   #test if max gold is 0 we will always get 0
   #EDGE CASE
@@ -196,6 +193,7 @@ class ProspectorTest < Minitest::Test
 	p.s = ''
 	assert_equal 'Found 1 ounce of gold in Sutter Creek', p.string_findings
   end
+  
   #UNIT TESTS FOR METHOD change_locations
   #SUCCESS CASES: The next location chosen is a neighbor of the current location
   #FAILURE CASES: The next location chosen is not a neighbor of the current location
@@ -233,8 +231,6 @@ class ProspectorTest < Minitest::Test
     "holding 1 ounce of gold and "\
 	"#1 ounce of silver"
   end
-  
-  
   
   #UNIT TEST FOR METHOD reset
   #Equivalence class:
@@ -279,7 +275,6 @@ class ProspectorTest < Minitest::Test
   end
   
   #test if num_locations <= 3 and only gold_found >0, we get false
-  
   def test_leaving_first_3_false_gold_found
     p = Prospector.new(0,0,0)
 	p.gold_found = 1
